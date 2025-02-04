@@ -36,7 +36,6 @@ O projeto está organizado da seguinte forma:
 *   Django 3.2.25
 *   Selenium
 *   PostgreSQL
-*   Driver do Chrome (compatível com a versão do seu navegador Chrome)
 
 ## Configuração
 
