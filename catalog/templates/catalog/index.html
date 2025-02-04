@@ -1,0 +1,257 @@
+<form method="get">
+    <label>
+        <input type="checkbox" name="free_shipping" {% if request.GET.free_shipping %}checked{% endif %}> Frete Grátis
+    </label>
+    <label>
+        <input type="checkbox" name="full_delivery" {% if request.GET.full_delivery %}checked{% endif %}> Entrega Full
+    </label>
+    <button type="submit">Filtrar</button>
+</form>
+
+<div class="highlights">
+    {% if highlights.max_price %}
+        <div>Maior Preço: R$ {{ highlights.max_price|floatformat:2 }}</div>
+    {% endif %}
+    {% if highlights.min_price %}
+        <div>Menor Preço: R$ {{ highlights.min_price|floatformat:2 }}</div>
+    {% endif %}
+    {% if highlights.max_discount %}
+        <div>Maior Desconto: {{ highlights.max_discount }}%</div>
+    {% endif %}
+</div>
+
+<!-- Listagem de Produtos -->
+<div class="products">
+    {% if products %}
+        {% for product in products %}
+            <div class="product-card">
+                <a href="{{ product.product_url }}" target="_blank">
+                    <img src="{{ product.image_url }}" alt="{{ product.name }}" loading="lazy">
+                </a>
+                <h3>{{ product.name }}</h3>
+                
+                <div class="pricing">
+                    <p class="current-price">R$ {{ product.price|floatformat:2 }}</p>
+                    
+                    {% if product.original_price %}
+                        <p class="original-price">
+                            De: R$ {{ product.original_price|floatformat:2 }}
+                            <span class="discount">({{ product.discount_percentage }}% OFF)</span>
+                        </p>
+                    {% endif %}
+                    
+                    {% if product.installment %}
+                        <p class="installment">{{ product.installment }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="shipping-info">
+                    <span class="delivery-type {{ product.delivery_type|lower }}">
+                        {{ product.delivery_type }}
+                    </span>
+                    {% if product.free_shipping %}
+                        <span class="free-shipping">🚚 Frete Grátis</span>
+                    {% endif %}
+                </div>
+
+                <a href="{{ product.product_url }}" class="product-link" target="_blank">
+                    Ver produto no Mercado Livre
+                </a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="no-results">
+            <p>Nenhum produto encontrado com os filtros selecionados!</p>
+            <p>Possíveis causas:</p>
+            <ul>
+                <li>Nenhum dado foi importado (execute o scraping primeiro)</li>
+                <li>Filtros muito restritivos</li>
+                <li>Problema na conexão com o banco de dados</li>
+            </ul>
+        </div>
+    {% endif %}
+</div>
+
+
+<!-- CSS -->
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: #007bff;
+}
+
+form {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+form label {
+    display: inline-block;
+    margin-right: 15px;
+    font-size: 0.9em;
+}
+
+form input[type="checkbox"] {
+    margin-right: 5px;
+}
+
+form button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9em;
+}
+
+form button:hover {
+    background-color: #0056b3;
+}
+
+.highlights {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.highlights div {
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.product-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.product-card img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.product-card h3 {
+    font-size: 1.1em;
+    margin-bottom: 10px;
+    height: 4.3em; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card .pricing {
+    margin-bottom: 10px;
+}
+
+.product-card .current-price {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #00a650;
+}
+
+.product-card .original-price {
+    font-size: 0.9em;
+    color: #999;
+    text-decoration: line-through;
+}
+
+.product-card .discount {
+    color: #00a650;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.product-card .installment {
+    font-size: 0.9em;
+    color: #333;
+}
+
+.product-card .shipping-info {
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.product-card .delivery-type {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+}
+
+.product-card .delivery-type.full {
+    background-color: #00a650;
+    color: #fff;
+}
+
+.product-card .delivery-type.normal {
+    background-color: #e6e6e6;
+    color: #333;
+}
+
+.product-card .free-shipping {
+    color: #00a650;
+    margin-left: 5px;
+}
+
+.product-card .product-link {
+    display: block;
+    background-color: #3483FA;
+    color: #fff;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 10px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.product-card .product-link:hover {
+    background-color: #2968C8;
+}
+
+.no-results {
+    text-align: center;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.no-results ul {
+    list-style: none;
+    padding: 0;
+}
+
+.no-results li {
+    margin-bottom: 5px;
+}
+</style>
